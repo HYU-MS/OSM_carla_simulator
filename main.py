@@ -44,7 +44,7 @@ vehicle = world.try_spawn_actor(vehicle_bp, specific_spawn_point)
 lights = world.get_actors().filter('traffic.traffic_light')
 for light in lights:
     light.set_state(carla.TrafficLightState.Green)
-    light.set_green_time(10000.0)
+    light.set_green_time(100000.0)
 #     # light.set_state(carla.TrafficLightState.Red)
 #     light.set_red_time(7.0)
 #     light.set_yellow_time(3.0)
@@ -52,10 +52,10 @@ for light in lights:
 # generate traffic
 blueprint_library = world.get_blueprint_library()
 cars = ['vehicle.tesla.model3', 'vehicle.audi.etron',  'vehicle.mercedes.coupe', 'vehicle.mercedes.coupe_2020',
-        'vehicle.carlamotors.carlacola', 'vehicle.nissan.patrol_2021', 'vehicle.mercedes.coupe_2020', 'vehicle.mercedes.sprinter', 'vehicle.lincoln.mkz_2020', 'vehicle.nissan.patrol_2021', 'vehicle.carlamotors.carlacola',
-        'vehicle.toyota.prius', 'vehicle.nissan.patrol_2021', 'vehicle.tesla.model3', 'vehicle.mercedes.coupe_2020', 
+        'vehicle.tesla.cybertruck', 'vehicle.nissan.patrol_2021', 'vehicle.mercedes.coupe_2020', 'vehicle.mercedes.sprinter', 'vehicle.lincoln.mkz_2020', 'vehicle.nissan.patrol_2021', 
+        'vehicle.lincoln.mkz_2020', 'vehicle.toyota.prius', 'vehicle.nissan.patrol_2021', 'vehicle.tesla.model3', 'vehicle.mercedes.coupe_2020', 
         'vehicle.mercedes.sprinter', 'vehicle.lincoln.mkz_2020', 'vehicle.nissan.patrol_2021', 'vehicle.mercedes.coupe',
-        'vehicle.mercedes.sprinter', 'vehicle.mitsubishi.fusorosa', 'vehicle.audi.a2', 'vehicle.nissan.micra', 'vehicle.bmw.grandtourer',
+        'vehicle.lincoln.mkz_2020', 'vehicle.mitsubishi.fusorosa', 'vehicle.audi.a2', 'vehicle.nissan.micra', 'vehicle.bmw.grandtourer',
         'vehicle.chevrolet.impala', 'vehicle.citroen.c3', 'vehicle.mercedes.sprinter',
         'vehicle.lincoln.mkz_2017', 'vehicle.toyota.prius',
         'vehicle.audi.etron', 'vehicle.audi.etron', 'vehicle.audi.etron',
@@ -64,7 +64,7 @@ cars = ['vehicle.tesla.model3', 'vehicle.audi.etron',  'vehicle.mercedes.coupe',
 
 car_blueprints = [blueprint_library.find(car) for car in cars]
 # Set the number of cars you want to spawn
-num_of_cars = 22
+num_of_cars = 17
 
 # List to hold all spawned car actors
 car_actors = []
