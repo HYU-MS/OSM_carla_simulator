@@ -6,29 +6,30 @@ import time
 import math
 import serial
 import time
+import random
 
-ser = serial.Serial('COM13', 115200) # Replace 'COM3' with your Arduino's serial port name
+# ser = serial.Serial('COM13', 115200) # Replace 'COM3' with your Arduino's serial port name
+
 time.sleep(3) # Wait for the serial connection to initialize
 
-ser.write(b'7')
-time.sleep(3)
-ser.write(b'8')
-time.sleep(3)
+# ser.write(b'7')
+# time.sleep(2)
+
+# ser.write(b'8')
+# time.sleep(2)
 
 
 # Connect to the CARLA server
 client = carla.Client('localhost', 2000)
 
 world = client.get_world()
-# world = client.load_world('Town05')
 settings = world.get_settings()
 settings.no_rendering_mode = True
 world.apply_settings(settings)
-
 actors = world.get_actors().filter('vehicle.*')
 
 traffic_manager = client.get_trafficmanager(8000)
-traffic_manager.global_percentage_speed_difference(10.0)
+traffic_manager.global_percentage_speed_difference(33.0)
 traffic_manager.set_global_distance_to_leading_vehicle(2)
 
 for actor in actors:
@@ -68,7 +69,7 @@ cars = ['vehicle.tesla.model3', 'vehicle.audi.etron',  'vehicle.mercedes.coupe',
 
 car_blueprints = [blueprint_library.find(car) for car in cars]
 # Set the number of cars you want to spawn
-num_of_cars = 21
+num_of_cars = 8
 
 # List to hold all spawned car actors
 car_actors = []
@@ -77,7 +78,7 @@ car_actors = []
 for i in range(num_of_cars):
     car_bp = car_blueprints[i]
     # Spawn the car
-    car_actor = world.spawn_actor(car_bp, spawn_points[4*i+1])
+    car_actor = world.spawn_actor(car_bp, spawn_points[7*i+1])
     
     # Add the car actor to the list
     car_actors.append(car_actor)
@@ -93,6 +94,10 @@ driver_camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
 driver_camera_bp.set_attribute('image_size_x', '1920')  # Adjust the resolution as desired
 driver_camera_bp.set_attribute('image_size_y', '1080')
 
+driver_camera_bp.set_attribute('image_size_x', '1024')  # test
+driver_camera_bp.set_attribute('image_size_y', '600')
+
+
 driver_camera_transform = carla.Transform(carla.Location(x=-0.05, y=-0.3, z=1.35))
 driver_camera = world.spawn_actor(driver_camera_bp, driver_camera_transform, attach_to=vehicle)
 
@@ -100,6 +105,9 @@ driver_camera = world.spawn_actor(driver_camera_bp, driver_camera_transform, att
 left_camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
 left_camera_bp.set_attribute('image_size_x', '1920')  # Adjust the resolution as desired
 left_camera_bp.set_attribute('image_size_y', '1200')
+
+left_camera_bp.set_attribute('image_size_x', '1024')  # Adjust the resolution as desired
+left_camera_bp.set_attribute('image_size_y', '600')
 
 left_camera_transform = carla.Transform(
     carla.Location(x=LEFT_CAMERA_POS_X, y=-1.02, z=CAMERA_POS_Z),
@@ -110,6 +118,10 @@ left_camera = world.spawn_actor(left_camera_bp, left_camera_transform, attach_to
 right_camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
 right_camera_bp.set_attribute('image_size_x', '1920')  # Adjust the resolution as desired
 right_camera_bp.set_attribute('image_size_y', '1200')
+
+right_camera_bp.set_attribute('image_size_x', '1024')  # Adjust the resolution as desired
+right_camera_bp.set_attribute('image_size_y', '600')
+
 right_camera_transform = carla.Transform(
     carla.Location(x=RIGHT_CAMERA_POS_X, y=1.02, z=CAMERA_POS_Z),
     carla.Rotation(yaw=180))
@@ -136,12 +148,21 @@ left_camera.listen(left_camera_callback)
 right_camera.listen(right_camera_callback)
 
 # Display function for each camera
+
+# def driver_camera_stream(camera_data, window_name):
+#     while True:
+#         if camera_data['image'] is not None:
+#             # Display the camera view using imshow
+#             cv2.imshow(window_name, camera_data['image'])
+#         if cv2.waitKey(1) == ord('q'):
+#             break
+
 def driver_camera_stream(camera_data, window_name):
     while True:
         if camera_data['image'] is not None:
             # Display the camera view using imshow
             cv2.namedWindow(window_name)
-            cv2.moveWindow(window_name, -18,-1105)
+            cv2.moveWindow(window_name, 0,-1110)
             cv2.imshow(window_name, camera_data['image'])
         if cv2.waitKey(1) == ord('q'):
             break
@@ -151,7 +172,7 @@ def left_camera_stream(camera_data, window_name):
         if camera_data['image'] is not None:
             # Display the camera view using imshow
             cv2.namedWindow(window_name)
-            cv2.moveWindow(window_name, 1896,-1233)
+            cv2.moveWindow(window_name, 1895,-1240)
             cv2.imshow(window_name, camera_data['image'])
         if cv2.waitKey(1) == ord('q'):
             break
@@ -161,15 +182,19 @@ def right_camera_stream(camera_data, window_name):
         if camera_data['image'] is not None:
             # Display the camera view using imshow
             cv2.namedWindow(window_name)
-            cv2.moveWindow(window_name, -1933,-1230)
+            cv2.moveWindow(window_name, -1939,-1240)
             cv2.imshow(window_name, camera_data['image'])
         if cv2.waitKey(1) == ord('q'):
             break
 
 # Create separate threads for displaying camera views
+# driver_display_thread = threading.Thread(target=driver_camera_stream, args=(driver_camera_data, 'Driver View'))
+# left_display_thread = threading.Thread(target=left_camera_stream, args=(left_camera_data, 'Left Side View Mirror'))
+# right_display_thread = threading.Thread(target=right_camera_stream, args=(right_camera_data, 'Right Side View Mirror'))
+
 driver_display_thread = threading.Thread(target=driver_camera_stream, args=(driver_camera_data, 'Driver View'))
-left_display_thread = threading.Thread(target=left_camera_stream, args=(left_camera_data, 'Left Side View Mirror'))
-right_display_thread = threading.Thread(target=right_camera_stream, args=(right_camera_data, 'Right Side View Mirror'))
+left_display_thread = threading.Thread(target=driver_camera_stream, args=(left_camera_data, 'Left Side View Mirror'))
+right_display_thread = threading.Thread(target=driver_camera_stream, args=(right_camera_data, 'Right Side View Mirror'))
 
 # Start the display threads
 driver_display_thread.start()
@@ -187,7 +212,7 @@ def update_side_mirror_angle():
     steering_reference = 0
     steer_previous = 0
     detect_off_count = 0
-    ser.write(b'1')
+    # ser.write(b'1')
     while True:
         steering_angle = round(vehicle.get_control().steer, 3)
 
@@ -196,7 +221,7 @@ def update_side_mirror_angle():
                 if abs(steering_angle) < 0.01:
                     detect_off_count += 1
                     if detect_off_count == 12:
-                        ser.write(b'1')
+                        # ser.write(b'1')
                         print("Detect Algorithm Deactivated")
                         detect_signal = False
                         detect_off_count = 0
@@ -309,7 +334,7 @@ def update_side_mirror_angle():
             # print('19.19.19.19.19')           
         else:
             if entered:
-                ser.write(b'2')
+                # ser.write(b'2')
                 print("Detect Algorithm Activated")
                 detect_signal = True
                 entered = False
@@ -323,7 +348,7 @@ def rotate_algorithm():
     if steering_reference > 0:
         if round(left_camera_transform.rotation.yaw) != 205:
             left_camera_transform.rotation.yaw += 0.19
-            ser.write(b'3')
+            # ser.write(b'3')
         else:
             turn_signal = False
             comeback_signal = True
@@ -335,7 +360,7 @@ def rotate_algorithm():
     elif steering_reference < 0:
         if round(right_camera_transform.rotation.yaw) != 155:
             right_camera_transform.rotation.yaw -= 0.19
-            ser.write(b'5')
+            # ser.write(b'5')
         else:
             turn_signal = False
             comeback_signal = True
@@ -351,9 +376,9 @@ def comeback_algorithm(steering_angle):
         if steering_reference > 0:
             if round(left_camera_transform.rotation.yaw) != 180:
                 left_camera_transform.rotation.yaw -= 0.5
-                ser.write(b'4')
+                # ser.write(b'4')
             else:
-                ser.write(b'1')
+                # ser.write(b'1')
                 comeback_signal = False
                 comeback_authorized = False
                 comeback_steers = 0
@@ -362,9 +387,9 @@ def comeback_algorithm(steering_angle):
         elif steering_reference < 0:
             if round(right_camera_transform.rotation.yaw) != 180:
                 right_camera_transform.rotation.yaw += 0.5
-                ser.write(b'6')
+                # ser.write(b'6')
             else:
-                ser.write(b'1')
+                # ser.write(b'1')
                 comeback_signal = False
                 comeback_authorized = False
                 comeback_steers = 0
